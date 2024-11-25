@@ -1,0 +1,3 @@
+/Users/hussainqureshi/CLionProjects/C-Wire/cmake-build-debug/CMakeFiles/C_Wire.dir
+/Users/hussainqureshi/CLionProjects/C-Wire/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/hussainqureshi/CLionProjects/C-Wire/cmake-build-debug/CMakeFiles/rebuild_cache.dir

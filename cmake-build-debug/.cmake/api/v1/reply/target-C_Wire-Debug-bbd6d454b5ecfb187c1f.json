@@ -50,8 +50,8 @@
 			"sourceIndexes" : 
 			[
 				0,
-				3,
-				4
+				1,
+				2
 			]
 		}
 	],
@@ -85,16 +85,15 @@
 			"sourceIndexes" : 
 			[
 				0,
-				3,
-				4
+				1,
+				2
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
-				1,
-				2
+				3
 			]
 		}
 	],
@@ -108,13 +107,9 @@
 		},
 		{
 			"backtrace" : 1,
-			"path" : "data_tree.h",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 1,
-			"path" : "process.h",
-			"sourceGroupIndex" : 1
+			"compileGroupIndex" : 0,
+			"path" : "data_tree.c",
+			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
@@ -124,9 +119,8 @@
 		},
 		{
 			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "data_tree.c",
-			"sourceGroupIndex" : 0
+			"path" : "settings.h",
+			"sourceGroupIndex" : 1
 		}
 	],
 	"type" : "EXECUTABLE"

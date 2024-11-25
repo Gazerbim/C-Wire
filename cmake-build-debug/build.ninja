@@ -55,14 +55,14 @@ build CMakeFiles/C_Wire.dir/main.c.o: C_COMPILER__C_Wire_unscanned_Debug /Users/
   OBJECT_DIR = CMakeFiles/C_Wire.dir
   OBJECT_FILE_DIR = CMakeFiles/C_Wire.dir
 
-build CMakeFiles/C_Wire.dir/process.c.o: C_COMPILER__C_Wire_unscanned_Debug /Users/hussainqureshi/CLionProjects/C-Wire/process.c || cmake_object_order_depends_target_C_Wire
-  DEP_FILE = CMakeFiles/C_Wire.dir/process.c.o.d
+build CMakeFiles/C_Wire.dir/data_tree.c.o: C_COMPILER__C_Wire_unscanned_Debug /Users/hussainqureshi/CLionProjects/C-Wire/data_tree.c || cmake_object_order_depends_target_C_Wire
+  DEP_FILE = CMakeFiles/C_Wire.dir/data_tree.c.o.d
   FLAGS = -g -std=gnu11 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/C_Wire.dir
   OBJECT_FILE_DIR = CMakeFiles/C_Wire.dir
 
-build CMakeFiles/C_Wire.dir/data_tree.c.o: C_COMPILER__C_Wire_unscanned_Debug /Users/hussainqureshi/CLionProjects/C-Wire/data_tree.c || cmake_object_order_depends_target_C_Wire
-  DEP_FILE = CMakeFiles/C_Wire.dir/data_tree.c.o.d
+build CMakeFiles/C_Wire.dir/process.c.o: C_COMPILER__C_Wire_unscanned_Debug /Users/hussainqureshi/CLionProjects/C-Wire/process.c || cmake_object_order_depends_target_C_Wire
+  DEP_FILE = CMakeFiles/C_Wire.dir/process.c.o.d
   FLAGS = -g -std=gnu11 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/C_Wire.dir
   OBJECT_FILE_DIR = CMakeFiles/C_Wire.dir
@@ -75,7 +75,7 @@ build CMakeFiles/C_Wire.dir/data_tree.c.o: C_COMPILER__C_Wire_unscanned_Debug /U
 #############################################
 # Link the executable C_Wire
 
-build C_Wire: C_EXECUTABLE_LINKER__C_Wire_Debug CMakeFiles/C_Wire.dir/main.c.o CMakeFiles/C_Wire.dir/process.c.o CMakeFiles/C_Wire.dir/data_tree.c.o
+build C_Wire: C_EXECUTABLE_LINKER__C_Wire_Debug CMakeFiles/C_Wire.dir/main.c.o CMakeFiles/C_Wire.dir/data_tree.c.o CMakeFiles/C_Wire.dir/process.c.o
   FLAGS = -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk
   OBJECT_DIR = CMakeFiles/C_Wire.dir
   POST_BUILD = :

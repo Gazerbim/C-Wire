@@ -6,6 +6,6 @@ set(CMAKE_C_STANDARD 11)
 add_executable(C_Wire
     main.c
         data_tree.c
-        data_tree.h
         process.c
-        process.h)
+        settings.h
+)

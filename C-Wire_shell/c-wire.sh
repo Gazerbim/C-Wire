@@ -13,7 +13,7 @@ display_help() {
     echo ""
     echo "Restrictions:"
     echo "  The following combinations are forbidden:"
-    echo "  - hvb all, hva all"
+    echo "  - hvb all, hva all, hvb indiv, hva indiv"
     echo ""
     echo "Example usage:"
     echo "  $0 data.csv hvb comp 1"
@@ -25,44 +25,44 @@ verify_parameters() {
     local station_type="$2"
     local consumer_type="$3"
 
-    if [[ ! -f "$csv_file" ]]; then
+    if [[ ! -f "$csv_file" ]]; then #! = negation and -f it's for file 
         echo "Error: File $csv_file does not exist." >&2
-        display_help
+        
         exit 1
     fi
 
     if [[ "$station_type" != "hvb" && "$station_type" != "hva" && "$station_type" != "lv" ]]; then
         echo "Error: Invalid station type. Choose hvb, hva, or lv." >&2
-        display_help
+        
         exit 1
     fi
 
     if [[ "$consumer_type" != "comp" && "$consumer_type" != "indiv" && "$consumer_type" != "all" ]]; then
         echo "Error: Invalid consumer type. Choose comp, indiv, or all." >&2
-        display_help
+        
         exit 1
     fi
 
     # Check the forbidden combinations of station/consumer
-    if { [[ "$station_type" == "hvb" || "$station_type" == "hva" ]] && [[ "$consumer_type" == "all" ]]; }; then
+    if { [[ "$station_type" == "hvb" || "$station_type" == "hva" ]] && [[ "$consumer_type" == "all" || "$consumer_type" == "indiv" ]]; }; then # {} it's because they are already [[]] in condition 
         echo "Error: The combination $station_type $consumer_type is forbidden." >&2
-        display_help
+       
         exit 1
     fi
 }
 
 # Check and create tmp directory
 check_and_create_tmp() {
-    if [[ -d "tmp" ]]; then
+    if [[ -d "tmp" ]]; then #-d it's for dossier 
         echo "The tmp directory already exists. Clearing its contents..."
-        rm -rf tmp/*
+        rm -rf tmp/* #delete all in tmp without tmp 
     else
         echo "Creating the tmp directory..."
         mkdir tmp
     fi
 }
 
-# Filter and copy data
+
 filter_and_copy_data() {
     local input_file="$1"
     local station_type="$2"
@@ -72,43 +72,61 @@ filter_and_copy_data() {
 
     echo "Filtering data based on station type, consumer type, and central ID..."
 
-    head -n 1 "$input_file" > "$output_file"
+    local station_index consumer_index
+    case "$station_type" in
+        hvb) station_index=2 ;;  # Column index for HVB
+        hva) station_index=3 ;;  # Column index for HVA
+        lv) station_index=4 ;;   # Column index for LV
+    esac
 
-    tail -n +2 "$input_file" | while IFS=';' read -r power_plant hvb_station hva_station lv_station company individual capacity load; do
-        local station_match="-"
-        case "$station_type" in
-            hvb) station_match="$hvb_station" ;;
-            hva) station_match="$hva_station" ;;
-            lv) station_match="$lv_station" ;;
-        esac
+    case "$consumer_type" in
+        comp) consumer_index=5 ;;  # Column index for companies
+        indiv) consumer_index=6 ;; # Column index for individuals
+        all) consumer_index="all" ;; # Match all consumers
+    esac
 
-        # Check if the station type matches (not '-') and matches the central_id (if provided)
-        if [[ "$station_match" != "-" ]]; then
-            local consumer_match="-"
-            case "$consumer_type" in
-                comp) consumer_match="$company" ;;
-                indiv) consumer_match="$individual" ;;
-                all) consumer_match="valid" ;;
-            esac
+    # Total number of lines for progress calculation
+    total_lines=$(wc -l < "$input_file")
+    processed_lines=0
 
-            # Check central_id match
-            local id_match="true"
-            if [[ "$central_id" != "all" ]]; then
-                if [[ "$central_id" != "$company" && "$central_id" != "$individual" ]]; then
-                    id_match="false"
-                fi
-            fi
+    # Use AWK for filtering with progress
+    awk -F';' -v station_idx="$station_index" -v consumer_idx="$consumer_index" -v central_id="$central_id" -v total_lines="$total_lines" '
+    BEGIN {
+        OFS = ";"
+        
+    }
+    NR == 1 { 
+        print > "tmp/filtered_data.dat"; 
+        next 
+    }
+    {
+        station_value = $station_idx;
+        consumer_value = consumer_idx == "all" ? "valid" : $consumer_idx;
 
-            # If all conditions match, append the row to the output file
-            if [[ "$consumer_match" != "-" && "$id_match" == "true" ]]; then
-                echo "$power_plant;$hvb_station;$hva_station;$lv_station;$company;$individual;$capacity;$load" >> "$output_file"
-            fi
-        fi
-    done
+        # Check station match
+        if (station_value != "-" && consumer_value != "-") {
+            # Check central_id match if provided
+            if (central_id == "all" || central_id == $1) {
+                print >> "tmp/filtered_data.dat";
+            }
+        }
+
+        # Update progress bar
+        if (NR % 100 == 0) {  # Update every 100 lines
+            printf "\rProgress: %.2f%%", (NR / total_lines) * 100 > "/dev/stderr";
+        }
+    }
+    END {
+        print "\rProgress: 100%   " > "/dev/stderr";
+    }' "$input_file"
 
     echo "Filtered data has been saved to $output_file"
+    nb_lignes=$(wc -l < "$output_file")
+    if [[ "$nb_lignes" == 1 ]]; then 
+        echo "There is no station $station_type $consumer_type"
+        exit 1
+    fi
 }
-
 # Main function
 main() {
     if [[ "$*" == *"-h"* ]]; then
@@ -118,7 +136,7 @@ main() {
 
     if [[ $# -lt 3 ]]; then
         echo "Error: Missing parameters." >&2
-        display_help
+        
         exit 1
     fi
 

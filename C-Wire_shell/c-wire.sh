@@ -127,7 +127,7 @@ filter_and_copy_data() {
         exit 1
     fi
 }
-# Main function
+
 main() {
     if [[ "$*" == *"-h"* ]]; then
         display_help

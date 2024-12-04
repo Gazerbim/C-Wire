@@ -7,6 +7,7 @@
 #include <math.h>
 #include <unistd.h>
 
+
 typedef struct Avl{
     struct Avl *leftSon;
     struct Avl *rightSon;

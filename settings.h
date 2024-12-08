@@ -35,4 +35,5 @@ void updateStation(pAvl tree, int id, int load);
 pAvl buildAvl(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,
                 char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload);
 
+
 #endif //SETTINGS_H

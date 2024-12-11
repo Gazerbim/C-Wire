@@ -6,11 +6,11 @@ void updateStation(pAvl tree, int id, long load){
     result = research(tree, id, &station);
     
     if(!result){
-        //printf("Station not found\n");
-        //exit(3);
+        printf("Station not found\n");
+        exit(3);
     }
     else{
-        //station->load += load;
+        station->load += load;
     }
     
 }

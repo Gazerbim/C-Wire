@@ -1,20 +1,25 @@
 #include "settings.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int min(int a, int b) {
     return (a < b) ? a : b;
-}
-
-int max(int a, int b) {
-    return (a > b) ? a : b;
 }
 
 int max3(int a, int b, int c) {
     return (a > b) ? (a > c ? a : c) : (b > c ? b : c);
 }
 
-int min3(int a, int b, int c) {
-    return (a < b) ? (a < c ? a : c) : (b < c ? b : c);
-}
+typedef struct Avl{
+    struct Avl *leftSon;
+    struct Avl *rightSon;
+    int balance;
+    long capacity;
+    int id;
+    long load;
+}Avl, *pAvl;
+
 
 pAvl createNode(){
     pAvl new = malloc(sizeof(Avl));
@@ -71,8 +76,8 @@ pAvl rotateLeft(pAvl node) {
     node->rightSon = pivot->leftSon;
     pivot->leftSon = node;
 
-    node->balance = balance_node - max(balance_pivot, 0) - 1;
-    pivot->balance = min3(balance_node - 2, balance_node + balance_pivot - 2, balance_pivot - 1);
+    node->balance = balance_node - min(balance_pivot, 0) - 1;
+    pivot->balance = max3(balance_node - 2, balance_node + balance_pivot - 2, balance_pivot - 1);
 
     return pivot;
 
@@ -150,12 +155,7 @@ int research(pAvl node, int id, pAvl *searched){
 void printAVL(pAvl node) {
     if (node != NULL){
         printAVL(node->leftSon);
-        printf("Station %d, capacity = %ld, load = %ld\n", node->id, node->capacity, node->load);
+        printf("Station %d, capacity = %d, load = %d\n", node->id, node->capacity, node->load);
         printAVL(node->rightSon);
     }
 }
-
-
-
-
-

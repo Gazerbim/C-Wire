@@ -109,7 +109,7 @@ pAvl readDataAndBuildAVL(pAvl tree, FILE * file,int isLv, int isHva, int isHvb){
 
 pAvl handleTreeProcess(pAvl tree, int isLv, int isHva, int isHvb){
     FILE *file;
-    char *filename = "C-Wire_shell/tmp/filtered_data.dat";
+    char *filename = "tmp/filtered_data.dat";
 
      // Open the file
     file = fopen(filename, "r");

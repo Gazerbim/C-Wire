@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "settings.h"
 
 int main(int argc, char *argv[]){
@@ -7,14 +5,14 @@ int main(int argc, char *argv[]){
     pAvl tree = NULL;
 
 
-    if (strcmp("lv", argv[1])){
+    if (strcmp("lv", argv[1])==0){
         isLv = 1;
-    }else if (strcmp("hva", argv[1])){
+    }else if (strcmp("hva", argv[1])==0){
         isHva = 1;
-    }else if (strcmp("hvb", argv[1])){
+    }else if (strcmp("hvb", argv[1])==0){
         isHvb = 1;
     }
     tree = handleTreeProcess(tree, isLv, isHva, isHvb);
-    
+    transferToFile(tree, isLv, isHva, isHvb);
     return 0;
 }

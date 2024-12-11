@@ -152,11 +152,7 @@ filter_and_copy_data() {
             # Check central_id match if provided
             if (central_id == "all" || central_id == $1) {
                 # Print from station_index to the end of the line
-                output = "";
-                for (i = station_idx; i <= NF; i++) {
-                    output = output (output == "" ? "" : OFS) $i;
-                }
-                print output >> "tmp/filtered_data.dat";
+                print >> "tmp/filtered_data.dat";
             }
         }
 

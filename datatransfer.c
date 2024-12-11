@@ -10,7 +10,7 @@ void fprintAVL(pAvl node, FILE *file) {
 
 void transferToFile(pAvl tree, int isLv, int isHva, int isHvb) {
     FILE *file;
-    file = fopen("data.txt", "w+");
+    file = fopen("data.csv", "w+");
     if (file == NULL) {
         printf("Error opening file\n");
         exit(4);

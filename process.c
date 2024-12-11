@@ -40,7 +40,7 @@ pAvl buildAvl(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,
     return tree;
 }
 
-pAvl buildSations(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva, char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload){
+pAvl buildStations(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva, char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload){
     int h;
     if(isLv){
         if (!(strcmp("-", ccomp) || strcmp("-", cindiv))){ // this is a lv station

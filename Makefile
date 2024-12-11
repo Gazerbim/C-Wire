@@ -1,7 +1,7 @@
 all: exec
 
 exec: main.o data_tree.o process.o data_transfer.o
-	gcc main.o data_tree.o process.o -o exec
+	gcc main.o data_tree.o process.o data_transfer.o -o exec
 
 main.o: main.c settings.h
 	gcc -c main.c -o main.o

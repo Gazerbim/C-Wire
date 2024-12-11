@@ -4,8 +4,16 @@ int min(int a, int b) {
     return (a < b) ? a : b;
 }
 
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
 int max3(int a, int b, int c) {
     return (a > b) ? (a > c ? a : c) : (b > c ? b : c);
+}
+
+int min3(int a, int b, int c) {
+    return (a < b) ? (a < c ? a : c) : (b < c ? b : c);
 }
 
 pAvl createNode(){
@@ -63,8 +71,8 @@ pAvl rotateLeft(pAvl node) {
     node->rightSon = pivot->leftSon;
     pivot->leftSon = node;
 
-    node->balance = balance_node - min(balance_pivot, 0) - 1;
-    pivot->balance = max3(balance_node - 2, balance_node + balance_pivot - 2, balance_pivot - 1);
+    node->balance = balance_node - max(balance_pivot, 0) - 1;
+    pivot->balance = min3(balance_node - 2, balance_node + balance_pivot - 2, balance_pivot - 1);
 
     return pivot;
 

@@ -68,6 +68,24 @@ check_and_create_tmp() {
     fi
 }
 
+# Measure execution time
+measure_time() {
+    local func="$1"          # Function name
+    shift                    # Remove function name from arguments
+    local start_time=$(date +%s.%N)  # Start time (seconds.nanoseconds)
+    
+    # Call the function with the remaining arguments
+    "$func" "$@"
+    local func_exit_code=$?
+
+    local end_time=$(date +%s.%N)  # End time
+    local elapsed_time=$(awk "BEGIN {print $end_time - $start_time}")  # Calculate using awk
+
+    printf "Execution time for %s: %.3f sec\n" "$func" "$elapsed_time"
+
+    return $func_exit_code
+}
+
 # Check and compile the executable
 check_and_compile() {
     local executable="exec"  # The name of the executable to check
@@ -98,7 +116,7 @@ check_and_compile() {
     
     # Execute the compiled executable
     echo "Executing '$executable'..."
-    ./$executable "$station_type"
+    measure_time ./$executable "$station_type"
 }
 
 # Filter and copy data
@@ -173,23 +191,7 @@ filter_and_copy_data() {
     fi
 }
 
-# Measure execution time
-measure_time() {
-    local func="$1"          # Function name
-    shift                    # Remove function name from arguments
-    local start_time=$(date +%s.%N)  # Start time (seconds.nanoseconds)
-    
-    # Call the function with the remaining arguments
-    "$func" "$@"
-    local func_exit_code=$?
 
-    local end_time=$(date +%s.%N)  # End time
-    local elapsed_time=$(awk "BEGIN {print $end_time - $start_time}")  # Calculate using awk
-
-    printf "Execution time for %s: %.3f sec\n" "$func" "$elapsed_time"
-
-    return $func_exit_code
-}
 
 # Main function
 main() {
@@ -224,6 +226,7 @@ main() {
     
     check_and_compile "$station_type"
     make clean
+    
 }
 
 main "$@"

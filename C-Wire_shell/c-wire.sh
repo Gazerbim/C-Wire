@@ -62,6 +62,8 @@ check_and_create_tmp() {
     fi
 }
 
+	
+
 
 filter_and_copy_data() {
     local input_file="$1"
@@ -84,27 +86,34 @@ filter_and_copy_data() {
         indiv) consumer_index=6 ;; # Column index for individuals
         all) consumer_index="all" ;; # Match all consumers
     esac
-
+    
+    if [[ "$consumer_index" == 5 ]]; then
+	local no_consumer=6
+    else
+	local no_consumer=5
+    fi
+ 
     # Total number of lines for progress calculation
     total_lines=$(wc -l < "$input_file")
     processed_lines=0
 
     # Use AWK for filtering with progress
-    awk -F';' -v station_idx="$station_index" -v consumer_idx="$consumer_index" -v central_id="$central_id" -v total_lines="$total_lines" '
+    awk -F';' -v station_idx="$station_index" -v consumer_idx="$consumer_index" -v central_id="$central_id" -v total_lines="$total_lines" -v no_consumer_idx="$no_consumer" '
     BEGIN {
         OFS = ";"
+
         
     }
-    NR == 1 { 
-        print > "tmp/filtered_data.dat"; 
+     NR == 1 { 
         next 
     }
     {
         station_value = $station_idx;
         consumer_value = consumer_idx == "all" ? "valid" : $consumer_idx;
+	no_consumer_value = $no_consumer_idx;
 
         # Check station match
-        if (station_value != "-" && consumer_value != "-") {
+        if ((station_value != "-" && no_consumer_value =="-") || (station_value != "-" && consumer_value != "-")) {
             # Check central_id match if provided
             if (central_id == "all" || central_id == $1) {
                 print >> "tmp/filtered_data.dat";
@@ -112,8 +121,8 @@ filter_and_copy_data() {
         }
 
         # Update progress bar
-        if (NR % 100 == 0) {  # Update every 100 lines
-            printf "\rProgress: %.2f%%", (NR / total_lines) * 100 > "/dev/stderr";
+        if (NR % 100000 == 0) {  # Update every 100 lines
+            printf "\rProgress: %.1f%%", (NR / total_lines) * 100 > "/dev/stderr";
         }
     }
     END {
@@ -126,9 +135,14 @@ filter_and_copy_data() {
         echo "There is no station $station_type $consumer_type"
         exit 1
     fi
+    echo -n "Elapsed time : "
 }
 
+
+
+# Main function
 main() {
+    TIMEFORMAT=%R
     if [[ "$*" == *"-h"* ]]; then
         display_help
         exit 0
@@ -153,10 +167,14 @@ main() {
     echo "Station type: $station_type"
     echo "Consumer type: $consumer_type"
     echo "Central ID: $central_id"
-
-    filter_and_copy_data "$csv_file" "$station_type" "$consumer_type" "$central_id"
-
+    #time print the time in sec
+    time filter_and_copy_data "$csv_file" "$station_type" "$consumer_type" "$central_id"
+    #tput cuu1 #go up a line
+    #tput cup $(($(tput lines) - 2)) 21 #offset from the edge of 20 place
+    #echo "sec"
+    
     echo "Processing completed successfully."
+    
 }
 
 main "$@"

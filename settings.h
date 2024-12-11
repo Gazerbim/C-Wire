@@ -19,7 +19,9 @@ typedef struct Avl{
 
 
 int min(int a, int b);
+int max(int a, int b);
 int max3(int a, int b, int c);
+int min3(int a, int b, int c);
 pAvl createNode();
 pAvl createAVL(long capacity, int id);
 int getBalance(pAvl node);

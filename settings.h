@@ -38,7 +38,7 @@ pAvl buildAvl(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,
             char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload);
 pAvl handleTreeProcess(pAvl tree, int isLv, int isHva, int isHvb);
 pAvl readDataAndBuildAVL(pAvl tree, FILE * file,int isLv, int isHva, int isHvb);
-pAvl buildSations(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,
+pAvl buildStations(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,
                 char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload);
 void fprintAVL(pAvl node, FILE *file);
 void transferToFile(pAvl tree, int isLv, int isHva, int isHvb);

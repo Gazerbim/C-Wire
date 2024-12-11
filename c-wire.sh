@@ -27,26 +27,26 @@ verify_parameters() {
 
     if [[ ! -f "$csv_file" ]]; then #! = negation and -f it's for file 
         echo "Error: File $csv_file does not exist." >&2
-        
+        display_help
         exit 1
     fi
 
     if [[ "$station_type" != "hvb" && "$station_type" != "hva" && "$station_type" != "lv" ]]; then
         echo "Error: Invalid station type. Choose hvb, hva, or lv." >&2
-        
+        display_help
         exit 1
     fi
 
     if [[ "$consumer_type" != "comp" && "$consumer_type" != "indiv" && "$consumer_type" != "all" ]]; then
         echo "Error: Invalid consumer type. Choose comp, indiv, or all." >&2
-        
+        display_help
         exit 1
     fi
 
     # Check the forbidden combinations of station/consumer
     if { [[ "$station_type" == "hvb" || "$station_type" == "hva" ]] && [[ "$consumer_type" == "all" || "$consumer_type" == "indiv" ]]; }; then # {} it's because they are already [[]] in condition 
         echo "Error: The combination $station_type $consumer_type is forbidden." >&2
-       
+        display_help
         exit 1
     fi
 }
@@ -60,9 +60,57 @@ check_and_create_tmp() {
         echo "Creating the tmp directory..."
         mkdir tmp
     fi
+    if [[ -d "graphs" ]]; then #-d it's for dossier 
+        echo "The graphs directory already exists."
+    else
+        echo "Creating the graphs directory..."
+        mkdir graphs
+    fi
 }
 
 	
+check_and_compile() {
+    local executable="exec"  # Le nom de l'exécutable à vérifier
+    local makefile="Makefile"
+    local station_type="$1"
+
+    # Vérifier si le Makefile existe
+    if [[ ! -f "$makefile" ]]; then
+        echo "Error: Makefile not found in the directory." >&2
+        exit 1
+    fi
+
+    # Vérifier si l'exécutable existe déjà
+    if [[ -f "$executable" ]]; then
+        echo "The executable '$executable' already exists."
+    else
+        echo "The executable '$executable' does not exist. Running 'make' to compile..."
+
+        # Vérifier si le Makefile contient une règle pour 'exec'
+        if ! grep -q "exec" "$makefile"; then
+            echo "Error: No target for 'exec' found in the Makefile." >&2
+            exit 1
+        fi
+
+        # Lancer 'make' pour compiler l'exécutable
+        make
+        if [[ $? -ne 0 ]]; then
+            echo "Error: Compilation failed using 'make'." >&2
+            exit 1
+        fi
+        echo "Compilation successful. Executable '$executable' created."
+    fi
+
+    # Vérifier si l'exécutable existe après compilation
+    if [[ ! -f "$executable" ]]; then
+        echo "Error: The executable '$executable' was not created." >&2
+        exit 1
+    fi
+    
+    echo "Executing '$executable'..."
+    ./$executable "$station_type"
+
+}
 
 
 filter_and_copy_data() {
@@ -86,6 +134,8 @@ filter_and_copy_data() {
         indiv) consumer_index=6 ;; # Column index for individuals
         all) consumer_index="all" ;; # Match all consumers
     esac
+	
+  
     
     if [[ "$consumer_index" == 5 ]]; then
 	local no_consumer=6
@@ -135,8 +185,27 @@ filter_and_copy_data() {
         echo "There is no station $station_type $consumer_type"
         exit 1
     fi
-    echo -n "Elapsed time : "
 }
+
+measure_time() {
+    local func="$1"          # Nom de la fonction
+    shift                    # Retire le nom de la fonction des arguments
+    local start_time=$(date +%s.%N)  # Temps de départ (secondes.nanosecondes)
+    
+    # Appel de la fonction avec les arguments restants
+    "$func" "$@"
+    local func_exit_code=$?
+
+    local end_time=$(date +%s.%N)  # Temps de fin
+    local elapsed_time=$(awk "BEGIN {print $end_time - $start_time}")  # Calcul avec awk
+
+    printf "Execution time for %s: %.3f sec\n" "$func" "$elapsed_time"
+
+    return $func_exit_code
+}
+
+#part_C() { }
+
 
 
 
@@ -150,7 +219,7 @@ main() {
 
     if [[ $# -lt 3 ]]; then
         echo "Error: Missing parameters." >&2
-        
+        display_help
         exit 1
     fi
 
@@ -162,18 +231,20 @@ main() {
     verify_parameters "$csv_file" "$station_type" "$consumer_type"
     check_and_create_tmp
 
+    
+
     # Display the parameters
     echo "CSV file: $csv_file"
     echo "Station type: $station_type"
     echo "Consumer type: $consumer_type"
     echo "Central ID: $central_id"
-    #time print the time in sec
-    time filter_and_copy_data "$csv_file" "$station_type" "$consumer_type" "$central_id"
-    #tput cuu1 #go up a line
-    #tput cup $(($(tput lines) - 2)) 21 #offset from the edge of 20 place
-    #echo "sec"
+    
+    measure_time filter_and_copy_data "$csv_file" "$station_type" "$consumer_type" "$central_id"
+    
+    
     
     echo "Processing completed successfully."
+    check_and_compile "$station_type"
     
 }
 

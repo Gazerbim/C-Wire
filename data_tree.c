@@ -106,7 +106,7 @@ pAvl balanceAVL(pAvl node){
 }
 
 pAvl insertAVL(pAvl node, long capacity, int *h, int id){
-    if(node==NULL){
+    if(node==NULL){ 
         *h = 1;
         return createAVL(capacity, id);
     }else if(id < node->id){
@@ -115,6 +115,7 @@ pAvl insertAVL(pAvl node, long capacity, int *h, int id){
     }else if(id > node->id){
         node->rightSon = insertAVL(node->rightSon, capacity, h, id);
     }else{
+        node->capacity = capacity; // update the capacity because the station already exists
         *h = 0;
         return node;
     }
@@ -131,18 +132,18 @@ pAvl insertAVL(pAvl node, long capacity, int *h, int id){
     return node;
 }
 
-int research(pAvl node, int id, pAvl *searched){
-    if (node==NULL){
+int research(pAvl node, int id, pAvl *searched) {
+    if (node == NULL) { // The station does not exists
+        *searched = node;
         return 0;
     }
-    if (node->id == id){
+    if (node->id == id) { // the station exists
         *searched = node;
         return 1;
     }
-    if (node->id > id){
+    if (id < node->id) {
         return research(node->leftSon, id, searched);
-    }
-    if (node->id < id){
+    } else {
         return research(node->rightSon, id, searched);
     }
 }

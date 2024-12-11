@@ -43,7 +43,7 @@ pAvl buildAvl(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,
 pAvl buildStations(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva, char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload){
     int h;
     if(isLv){
-        if (!(strcmp("-", ccomp) || strcmp("-", cindiv))){ // this is a lv station
+        if (!strcmp("-", ccomp) && !strcmp("-", cindiv)){ // this is a lv station
             tree = insertAVL(tree, atol(ccapa), &h, atol(clv));
         }
     }else if(isHva){

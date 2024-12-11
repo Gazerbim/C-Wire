@@ -81,7 +81,7 @@ pAvl readDataAndBuildAVL(pAvl tree, FILE * file,int isLv, int isHva, int isHvb){
         cload = strtok(NULL, ";");
         //printf("%s %s %s %s %s %s %s %s\n", cpp, chvb, chva, clv, ccomp, cindiv, ccapa, cload);
         
-        tree = buildSations(tree, isLv, isHva, isHvb, chvb, chva, clv, ccomp, cindiv, ccapa, cload);
+        tree = buildStations(tree, isLv, isHva, isHvb, chvb, chva, clv, ccomp, cindiv, ccapa, cload);
     }
     rewind(file);
     // read each line the second time to sum the consuptions

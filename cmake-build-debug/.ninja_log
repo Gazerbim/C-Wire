@@ -1,5 +1,0 @@
-# ninja log v6
-24	700	1733906685319525725	CMakeFiles/C_Wire.dir/main.c.o	64ff7ef6cba4c04
-25	702	1733906685320432542	CMakeFiles/C_Wire.dir/process.c.o	addabc68d6eaff0b
-25	702	1733906685320080540	CMakeFiles/C_Wire.dir/data_tree.c.o	691c335f1eac966
-702	911	1733906685997523993	C_Wire	6987450e9930d6fd

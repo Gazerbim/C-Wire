@@ -223,6 +223,7 @@ main() {
     echo "Processing completed successfully."
     
     check_and_compile "$station_type"
+    make clean
 }
 
 main "$@"

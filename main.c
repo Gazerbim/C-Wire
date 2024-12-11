@@ -1,4 +1,4 @@
-#include <setting.h>
+#include "settings.h"
 
 int main() {
     FILE *file;

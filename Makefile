@@ -1,6 +1,6 @@
 all: exec
 
-exec: main.o data_tree.o process.o
+exec: main.o data_tree.o process.o datatrsf.o
 	gcc main.o data_tree.o process.o -o exec
 
 main.o: main.c settings.h
@@ -11,6 +11,9 @@ data_tree.o: data_tree.c settings.h
 
 process.o: process.c settings.h
 	gcc -c process.c -o process.o
+
+datatrsf.o: datatrsf.c settings.h
+	gcc -c datatrsf.c -o datatrsf.o
 
 clean:
 	rm -f *.o

@@ -34,9 +34,13 @@ pAvl insertAVL(pAvl node, long capacity, int *h, int id);
 int research(pAvl node, int id, pAvl *searched);
 void printAVL(pAvl node);
 void updateStation(pAvl tree, int id, long load);
-pAvl buildAvl(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload);
+pAvl buildAvl(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,
+            char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload);
 pAvl handleTreeProcess(pAvl tree, int isLv, int isHva, int isHvb);
 pAvl readDataAndBuildAVL(pAvl tree, FILE * file,int isLv, int isHva, int isHvb);
-pAvl buildStations(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva, char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload);
+pAvl buildSations(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,
+                char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload);
+void fprintAVL(pAvl node, FILE *file);
+void transferToFile(pAvl tree, int isLv, int isHva, int isHvb);
 
 #endif //SETTINGS_H

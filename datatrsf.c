@@ -13,7 +13,7 @@ void transferToFile(pAvl tree, int isLv, int isHva, int isHvb) {
     file = fopen("data.txt", "w+");
     if (file == NULL) {
         printf("Error opening file\n");
-        exit(EXIT_FAILURE);
+        exit(4);
     }
     if (isLv) {
         fprintf(file, "Station LV:Capacité:Consommation\n");

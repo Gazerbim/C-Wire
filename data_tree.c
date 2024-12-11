@@ -4,7 +4,7 @@ int min(int a, int b) {
     return (a < b) ? a : b;
 }
 
-int min(int a, int b) {
+int max(int a, int b) {
     return (a > b) ? a : b;
 }
 
@@ -150,7 +150,7 @@ int research(pAvl node, int id, pAvl *searched){
 void printAVL(pAvl node) {
     if (node != NULL){
         printAVL(node->leftSon);
-        printf("Station %d, capacity = %d, load = %d\n", node->id, node->capacity, node->load);
+        printf("Station %d, capacity = %ld, load = %ld\n", node->id, node->capacity, node->load);
         printAVL(node->rightSon);
     }
 }

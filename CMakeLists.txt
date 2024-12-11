@@ -8,5 +8,5 @@ add_executable(C_Wire
         data_tree.c
         process.c
         settings.h
-        datatransfer.c
+        data_transfer.c
 )

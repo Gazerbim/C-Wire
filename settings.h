@@ -37,6 +37,6 @@ void updateStation(pAvl tree, int id, long load);
 pAvl buildAvl(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload);
 pAvl handleTreeProcess(pAvl tree, int isLv, int isHva, int isHvb);
 pAvl readDataAndBuildAVL(pAvl tree, FILE * file,int isLv, int isHva, int isHvb);
-pAvl buildSations(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva, char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload);
+pAvl buildStations(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva, char *clv, char *ccomp, char *cindiv, char *ccapa, char *cload);
 
 #endif //SETTINGS_H

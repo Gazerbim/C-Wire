@@ -12,7 +12,7 @@ data_tree.o: data_tree.c settings.h
 process.o: process.c settings.h
 	gcc -c process.c -o process.o
 
-datatrsf.o: datatrsf.c settings.h
+datatrsf.o: datatransfer.c settings.h
 	gcc -c datatrsf.c -o datatrsf.o
 
 clean:

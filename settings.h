@@ -39,7 +39,7 @@ pAvl buildAvl(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,
 pAvl handleTreeProcess(pAvl tree, int isLv, int isHva, int isHvb);
 pAvl readDataAndBuildAVL(pAvl tree, FILE * file,int isLv, int isHva, int isHvb);
 void fprintAVL(pAvl node, FILE *file);
-void transferToFile(pAvl tree, int isLv, int isHva, int isHvb);
+void transferToFile(pAvl tree, int isLv, int isHva, int isHvb, char* station, char* consumer, char* powerplant);
 void freeTree(pAvl node);
 
 #endif //SETTINGS_H

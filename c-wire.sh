@@ -94,8 +94,9 @@ measure_time() {
 
 # Function: Check for Makefile and compile the executable
 check_and_compile() {
-    local executable="CodeC/exec"  # The name of the executable to check
-    local makefile="CodeC/Makefile"
+    cd CodeC/
+    local executable="exec"  # The name of the executable to check
+    local makefile="Makefile"
     local station_type="$1"
     local consumer_type="$2"
     local central_id="$3"
@@ -125,6 +126,7 @@ check_and_compile() {
     # Execute the compiled executable
     echo "Executing '$executable'..."
     measure_time ./$executable "$station_type" "$consumer_type" "$central_id"
+    cd ..
 }
 
 # Function: Filter and copy data from the CSV file
@@ -197,6 +199,7 @@ filter_and_copy_data() {
 }
 
 sort_file() {
+    cd tests/
     local station_type="$1"
     local consumer_type="$2"
     local central_id="$3"
@@ -210,12 +213,12 @@ sort_file() {
     fi
 
     # Vérifier si le fichier source existe et contient des données
-    if [[ ! -f "tests/$input_file" ]]; then
+    if [[ ! -f "$input_file" ]]; then
         echo "Error: $input_file not found. Ensure the filtering step is completed." >&2
         exit 1
     fi
 
-    if [[ ! -s "tests/$input_file" ]]; then
+    if [[ ! -s "$input_file" ]]; then
         echo "Error: $input_file is empty. Check the filtering process." >&2
         exit 1
     fi
@@ -232,18 +235,19 @@ sort_file() {
 
         # Trier les lignes à partir de la deuxième, sur la colonne numérique appropriée
         tail -n +2 "$input_file" | sort -t ':' -k2,2n
-    } > "tests/$temp_sorted_file"
+    } > "$temp_sorted_file"
 
     # Vérifier si le tri a fonctionné
-    if [[ ! -s "tests/$temp_sorted_file" ]]; then
-        echo "Error: Sorting failed. tests/$temp_sorted_file is empty." >&2
+    if [[ ! -s "$temp_sorted_file" ]]; then
+        echo "Error: Sorting failed. $temp_sorted_file is empty." >&2
         exit 1
     fi
 
     # Remplacer le contenu de l'ancien fichier par le fichier trié
-    mv "tests/$temp_sorted_file" "tests/$input_file"
+    mv "$temp_sorted_file" "$input_file"
 
     echo "File tests/$input_file successfully updated with sorted data."
+    cd ..
 }
 
 
@@ -284,8 +288,9 @@ main() {
     check_and_compile "$station_type" "$consumer_type" "$central_id"
 
     measure_time sort_file "$station_type" "$consumer_type" "$central_id"
-   
+    cd CodeC/
     make clean
+    cd ..
 }
 
 main "$@"

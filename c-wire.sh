@@ -19,31 +19,34 @@ display_help() {
     echo "  $0 data.csv hvb comp 1"
 }
 
-# Verify parameters
+# Function: Verify parameters passed to the script
 verify_parameters() {
     local csv_file="$1"
     local station_type="$2"
     local consumer_type="$3"
 
+    # Check if the CSV file exists
     if [[ ! -f "$csv_file" ]]; then
         echo "Error: File $csv_file does not exist." >&2
         display_help
         exit 1
     fi
 
+    # Validate station type
     if [[ "$station_type" != "hvb" && "$station_type" != "hva" && "$station_type" != "lv" ]]; then
         echo "Error: Invalid station type. Choose hvb, hva, or lv." >&2
         display_help
         exit 1
     fi
 
+    # Validate consumer type
     if [[ "$consumer_type" != "comp" && "$consumer_type" != "indiv" && "$consumer_type" != "all" ]]; then
         echo "Error: Invalid consumer type. Choose comp, indiv, or all." >&2
         display_help
         exit 1
     fi
 
-    # Check the forbidden combinations of station/consumer
+    # Check forbidden combinations of station/consumer
     if { [[ "$station_type" == "hvb" || "$station_type" == "hva" ]] && [[ "$consumer_type" == "all" || "$consumer_type" == "indiv" ]]; }; then
         echo "Error: The combination $station_type $consumer_type is forbidden." >&2
         display_help
@@ -51,15 +54,18 @@ verify_parameters() {
     fi
 }
 
-# Check and create tmp directory 
+# Function: Check and create necessary directories
 check_and_create_tmp() {
+    # Ensure "tmp" directory exists and is empty
     if [[ -d "tmp" ]]; then
         echo "The tmp directory already exists. Clearing its contents..."
-        rm -rf tmp/* #delete all in tmp without tmp 
+        rm -rf tmp/* # Delete all contents of "tmp" without deleting the directory
     else
         echo "Creating the tmp directory..."
         mkdir tmp
     fi
+
+    # Ensure "graphs" directory exists
     if [[ -d "graphs" ]]; then
         echo "The graphs directory already exists."
     else
@@ -68,12 +74,12 @@ check_and_create_tmp() {
     fi
 }
 
-# Measure execution time
+# Function: Measure execution time of a given function
 measure_time() {
     local func="$1"          # Function name
     shift                    # Remove function name from arguments
     local start_time=$(date +%s.%N)  # Start time (seconds.nanoseconds)
-    
+
     # Call the function with the remaining arguments
     "$func" "$@"
     local func_exit_code=$?
@@ -86,7 +92,7 @@ measure_time() {
     return $func_exit_code
 }
 
-# Check and compile the executable
+# Function: Check for Makefile and compile the executable
 check_and_compile() {
     local executable="exec"  # The name of the executable to check
     local makefile="Makefile"
@@ -115,30 +121,31 @@ check_and_compile() {
         echo "Error: The executable '$executable' was not created." >&2
         exit 1
     fi
-    
+
     # Execute the compiled executable
     echo "Executing '$executable'..."
     measure_time ./$executable "$station_type" "$consumer_type" "$central_id"
 }
 
-# Filter and copy data
+# Function: Filter and copy data from the CSV file
 filter_and_copy_data() {
     local input_file="$1"
     local station_type="$2"
     local consumer_type="$3"
     local central_id="$4"
     local output_file="tmp/filtered_data.dat"
-   
 
     echo "Filtering data based on station type, consumer type, and central ID..."
 
+    # Determine column indices based on station type
     local station_index consumer_index no_station
     case "$station_type" in
         hvb) station_index=2 ; no_station=3 ;;  # Column index for HVB
         hva) station_index=3 ; no_station=4 ;;  # Column index for HVA
         lv) station_index=4 ; no_station=2 ;;   # Column index for LV
     esac
-    local no_consumer
+
+    # Determine column indices based on consumer type
     case "$consumer_type" in
         comp) consumer_index=5 ; no_consumer=6 ;;  # Column index for companies
         indiv) consumer_index=6 ; no_consumer=5 ;; # Column index for individuals
@@ -189,10 +196,7 @@ filter_and_copy_data() {
     fi
 }
 
-
-
-
-# Main function
+# Main function: Orchestrates the script's operations
 main() {
     TIMEFORMAT=%R
     if [[ "$*" == *"-h"* ]]; then
@@ -200,6 +204,7 @@ main() {
         exit 0
     fi
 
+    # Check minimum parameter count
     if [[ $# -lt 3 ]]; then
         echo "Error: Missing parameters." >&2
         display_help
@@ -223,13 +228,9 @@ main() {
     measure_time filter_and_copy_data "$csv_file" "$station_type" "$consumer_type" "$central_id"
     echo "Processing completed successfully."
 
-    
-    
     check_and_compile "$station_type" "$consumer_type" "$central_id"
 
     make clean
-    
-    
 }
 
 main "$@"

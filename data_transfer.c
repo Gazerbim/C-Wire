@@ -1,5 +1,6 @@
 #include "settings.h"
 
+//will write the data in the tree in the file in the id order
 void fprintAVL(pAvl node, FILE *file) {
     if (node != NULL){
         fprintAVL(node->leftSon, file);
@@ -8,6 +9,7 @@ void fprintAVL(pAvl node, FILE *file) {
     }
 }
 
+//will write the header and launch the fprintAVL function
 void transferToFile(pAvl tree, int isLv, int isHva, int isHvb) {
     FILE *file;
     file = fopen("data.csv", "w+");

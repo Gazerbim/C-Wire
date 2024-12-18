@@ -92,6 +92,7 @@ check_and_compile() {
     local makefile="Makefile"
     local station_type="$1"
     local consumer_type="$2"
+    local central_id="$3"
 
     # Verify if the Makefile exists
     if [[ ! -f "$makefile" ]]; then
@@ -117,7 +118,7 @@ check_and_compile() {
     
     # Execute the compiled executable
     echo "Executing '$executable'..."
-    measure_time ./$executable "$station_type" "$consumer_type"
+    measure_time ./$executable "$station_type" "$consumer_type" "$central_id"
 }
 
 # Filter and copy data
@@ -224,7 +225,7 @@ main() {
 
     
     
-    check_and_compile "$station_type" "$consumer_type"
+    check_and_compile "$station_type" "$consumer_type" "$central_id"
 
     make clean
     

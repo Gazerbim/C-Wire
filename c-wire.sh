@@ -72,6 +72,14 @@ check_and_create_tmp() {
         echo "Creating the graphs directory..."
         mkdir graphs
     fi
+
+    # Ensure "tests" directory exists
+    if [[ -d "tests" ]]; then
+        echo "The tests directory already exists."
+    else
+        echo "Creating the tests directory..."
+        mkdir tests
+    fi
 }
 
 # Function: Measure execution time of a given function
@@ -200,17 +208,9 @@ filter_and_copy_data() {
 
 sort_file() {
     cd tests/
-    local station_type="$1"
-    local consumer_type="$2"
-    local central_id="$3"
-
-    # Déterminer le nom du fichier source
-    local input_file
-    if [[ "$central_id" == "all" ]]; then
-        input_file="${station_type}_${consumer_type}.csv"
-    else
-        input_file="${station_type}_${consumer_type}_${central_id}.csv"
-    fi
+    
+    local input_file="$1"
+    
 
     # Vérifier si le fichier source existe et contient des données
     if [[ ! -f "$input_file" ]]; then
@@ -251,6 +251,38 @@ sort_file() {
 }
 
 
+# Function: Copy and transform CSV to remove ';' and save as .csv in 'graphs'
+copy_and_transform_csv() {
+    local input_file="tests/$1"
+    local output_file="graphs/$1"
+    
+
+    # Check if the input file exists
+    if [[ ! -f "$input_file" ]]; then
+        echo "Error: Input file '$input_file' does not exist." >&2
+        exit 1
+    fi
+
+    # Transform and copy the file
+    echo "Removing ';' and saving as CSV to '$output_file'..."
+    sed 's/:/ /g' "$input_file" > "$output_file"
+
+    # Check if the transformation succeeded
+    if [[ $? -ne 0 ]]; then
+        echo "Error: Failed to transform and copy '$input_file'." >&2
+        exit 1
+    fi
+
+    # Verify the output file is not empty
+    if [[ ! -s "$output_file" ]]; then
+        echo "Error: The output file '$output_file' is empty. Something went wrong." >&2
+        exit 1
+    fi
+
+    echo "File has been successfully transformed and saved to '$output_file'."
+}
+
+
     
 
 # Main function: Orchestrates the script's operations
@@ -286,8 +318,19 @@ main() {
     echo "Processing completed successfully."
 
     check_and_compile "$station_type" "$consumer_type" "$central_id"
+	
+    # Déterminer le nom du fichier source
+    local input_file
+    if [[ "$central_id" == "all" ]]; then
+        input_file="${station_type}_${consumer_type}.csv"
+    else
+        input_file="${station_type}_${consumer_type}_${central_id}.csv"
+    fi
 
-    measure_time sort_file "$station_type" "$consumer_type" "$central_id"
+    measure_time sort_file "$input_file"
+
+    copy_and_transform_csv "$input_file"
+
     cd CodeC/
     make clean
     cd ..

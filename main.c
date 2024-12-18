@@ -14,5 +14,6 @@ int main(int argc, char *argv[]){
     }
     tree = handleTreeProcess(tree, isLv, isHva, isHvb);
     transferToFile(tree, isLv, isHva, isHvb);
+    freeTree(tree);
     return 0;
 }

@@ -126,34 +126,29 @@ filter_and_copy_data() {
     local consumer_type="$3"
     local central_id="$4"
     local output_file="tmp/filtered_data.dat"
+   
 
     echo "Filtering data based on station type, consumer type, and central ID..."
 
-    local station_index consumer_index
+    local station_index consumer_index no_station
     case "$station_type" in
-        hvb) station_index=2 ;;  # Column index for HVB
-        hva) station_index=3 ;;  # Column index for HVA
-        lv) station_index=4 ;;   # Column index for LV
+        hvb) station_index=2 ; no_station=3 ;;  # Column index for HVB
+        hva) station_index=3 ; no_station=4 ;;  # Column index for HVA
+        lv) station_index=4 ; no_station=2 ;;   # Column index for LV
     esac
-
+    local no_consumer
     case "$consumer_type" in
-        comp) consumer_index=5 ;;  # Column index for companies
-        indiv) consumer_index=6 ;; # Column index for individuals
-        all) consumer_index="all" ;; # Match all consumers
+        comp) consumer_index=5 ; no_consumer=6 ;;  # Column index for companies
+        indiv) consumer_index=6 ; no_consumer=5 ;; # Column index for individuals
+        all) consumer_index="all" ; no_consumer="none" ;; # Match all consumers
     esac
-
-    if [[ "$consumer_index" == 5 ]]; then
-        local no_consumer=6
-    else
-        local no_consumer=5
-    fi
 
     # Total number of lines for progress calculation
     total_lines=$(wc -l < "$input_file")
     processed_lines=0
 
     # Use AWK for filtering with progress
-    awk -F';' -v station_idx="$station_index" -v consumer_idx="$consumer_index" -v central_id="$central_id" -v total_lines="$total_lines" -v no_consumer_idx="$no_consumer" '
+    awk -F';' -v station_idx="$station_index" -v consumer_idx="$consumer_index" -v central_id="$central_id" -v total_lines="$total_lines" -v no_consumer_idx="$no_consumer" -v no_station_idx="$no_station" '
     BEGIN {
         OFS = ";"
     }
@@ -166,11 +161,12 @@ filter_and_copy_data() {
         no_consumer_value = $no_consumer_idx;
 
         # Check station match
-        if ((station_value != "-" && no_consumer_value == "-") || (station_value != "-" && consumer_value != "-")) {
+	
+        if ((station_value != "-" && no_consumer_value == "-" && $no_station_idx == "-") || (station_value != "-" && consumer_value != "-")) {
             # Check central_id match if provided
             if (central_id == "all" || central_id == $1) {
                 # Print from station_index to the end of the line
-                print >> "tmp/filtered_data.dat";
+                print  >> "tmp/filtered_data.dat";
             }
         }
 
@@ -190,6 +186,7 @@ filter_and_copy_data() {
         exit 1
     fi
 }
+
 
 
 
@@ -223,9 +220,13 @@ main() {
     
     measure_time filter_and_copy_data "$csv_file" "$station_type" "$consumer_type" "$central_id"
     echo "Processing completed successfully."
+
+    
     
     check_and_compile "$station_type"
+
     make clean
+    
     
 }
 

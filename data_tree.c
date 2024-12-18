@@ -105,6 +105,7 @@ pAvl balanceAVL(pAvl node){
     return node;
 }
 
+//insert a new station or update the capacity of the station if it already exists
 pAvl insertAVL(pAvl node, long capacity, int *h, int id){
     if(node==NULL){ 
         *h = 1;
@@ -132,6 +133,7 @@ pAvl insertAVL(pAvl node, long capacity, int *h, int id){
     return node;
 }
 
+//research for a station based on the id
 int research(pAvl node, int id, pAvl *searched) {
     if (node == NULL) { // The station does not exists
         *searched = node;
@@ -148,6 +150,7 @@ int research(pAvl node, int id, pAvl *searched) {
     }
 }
 
+// print the avl tree with a postorder way
 void printAVL(pAvl node) {
     if (node != NULL){
         printAVL(node->leftSon);

@@ -21,7 +21,6 @@ void transferToFile(pAvl tree, int isLv, int isHva, int isHvb, char* station, ch
         strcat(fileTitle, powerplant);
     }
     strcat(fileTitle, ".csv");
-    printf("%s\n", fileTitle);
     file = fopen(fileTitle, "w+");
     if (file == NULL) {
         printf("Error opening file\n");

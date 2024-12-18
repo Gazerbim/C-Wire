@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
         isHvb = 1;
     }
     tree = handleTreeProcess(tree, isLv, isHva, isHvb);
-    transferToFile(tree, isLv, isHva, isHvb);
+    transferToFile(tree, isLv, isHva, isHvb, argv[1], argv[2], argv[3]);
     freeTree(tree);
     return 0;
 }

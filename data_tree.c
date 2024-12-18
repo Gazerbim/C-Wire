@@ -158,3 +158,11 @@ void printAVL(pAvl node) {
         printAVL(node->rightSon);
     }
 }
+
+void freeTree(pAvl node){
+    if (node != NULL){
+    freeTree(node->leftSon);
+    freeTree(node->rightSon);
+    free(node);
+    }
+}

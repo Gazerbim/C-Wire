@@ -40,5 +40,6 @@ pAvl handleTreeProcess(pAvl tree, int isLv, int isHva, int isHvb);
 pAvl readDataAndBuildAVL(pAvl tree, FILE * file,int isLv, int isHva, int isHvb);
 void fprintAVL(pAvl node, FILE *file);
 void transferToFile(pAvl tree, int isLv, int isHva, int isHvb);
+void freeTree(pAvl node);
 
 #endif //SETTINGS_H

@@ -27,13 +27,13 @@ void transferToFile(pAvl tree, int isLv, int isHva, int isHvb, char* station, ch
         exit(4);
     }
     if (isLv) {
-        fprintf(file, "LV Station:Capacity:Consumption (%s)\n", consumer);
+        fprintf(file, "LV_Station:Capacity:Consumption_(%s)\n", consumer);
     }
     if (isHva) {
-        fprintf(file, "HVA Station:Capacity:Consumption (%s)\n", consumer);
+        fprintf(file, "HVA_Station:Capacity:Consumption_(%s)\n", consumer);
     }
     if (isHvb) {
-        fprintf(file, "HVB Station:Capacity:Consumption (%s)\n", consumer);
+        fprintf(file, "HVB_Station:Capacity:Consumption_(%s)\n", consumer);
     }
     fprintAVL(tree, file);
     fclose(file);

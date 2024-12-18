@@ -94,8 +94,8 @@ measure_time() {
 
 # Function: Check for Makefile and compile the executable
 check_and_compile() {
-    local executable="exec"  # The name of the executable to check
-    local makefile="Makefile"
+    local executable="CodeC/exec"  # The name of the executable to check
+    local makefile="CodeC/Makefile"
     local station_type="$1"
     local consumer_type="$2"
     local central_id="$3"
@@ -196,6 +196,59 @@ filter_and_copy_data() {
     fi
 }
 
+sort_file() {
+    local station_type="$1"
+    local consumer_type="$2"
+    local central_id="$3"
+
+    # Déterminer le nom du fichier source
+    local input_file
+    if [[ "$central_id" == "all" ]]; then
+        input_file="${station_type}_${consumer_type}.csv"
+    else
+        input_file="${station_type}_${consumer_type}_${central_id}.csv"
+    fi
+
+    # Vérifier si le fichier source existe et contient des données
+    if [[ ! -f "tests/$input_file" ]]; then
+        echo "Error: $input_file not found. Ensure the filtering step is completed." >&2
+        exit 1
+    fi
+
+    if [[ ! -s "tests/$input_file" ]]; then
+        echo "Error: $input_file is empty. Check the filtering process." >&2
+        exit 1
+    fi
+
+    # Déterminer le nom du fichier temporaire pour le tri
+    local temp_sorted_file="${input_file%.csv}_sorted.csv"
+
+    echo "Sorting data by numeric capacity in ascending order from $input_file..."
+
+    # Traiter l'en-tête et trier les données
+    {
+        # Extraire l'en-tête
+        head -n 1 "$input_file"
+
+        # Trier les lignes à partir de la deuxième, sur la colonne numérique appropriée
+        tail -n +2 "$input_file" | sort -t ':' -k2,2n
+    } > "tests/$temp_sorted_file"
+
+    # Vérifier si le tri a fonctionné
+    if [[ ! -s "tests/$temp_sorted_file" ]]; then
+        echo "Error: Sorting failed. tests/$temp_sorted_file is empty." >&2
+        exit 1
+    fi
+
+    # Remplacer le contenu de l'ancien fichier par le fichier trié
+    mv "tests/$temp_sorted_file" "tests/$input_file"
+
+    echo "File tests/$input_file successfully updated with sorted data."
+}
+
+
+    
+
 # Main function: Orchestrates the script's operations
 main() {
     TIMEFORMAT=%R
@@ -211,7 +264,7 @@ main() {
         exit 1
     fi
 
-    local csv_file="$1"
+    local csv_file="inputs/$1"
     local station_type="$2"
     local consumer_type="$3"
     local central_id="${4:-all}"  # Default to "all" if not provided
@@ -230,6 +283,8 @@ main() {
 
     check_and_compile "$station_type" "$consumer_type" "$central_id"
 
+    measure_time sort_file "$station_type" "$consumer_type" "$central_id"
+   
     make clean
 }
 

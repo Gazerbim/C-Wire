@@ -281,6 +281,50 @@ copy_and_transform_csv() {
 
     echo "File has been successfully transformed and saved to '$output_file'."
 }
+sort_file_minmax() {
+    local input_file="tests/$1"
+    local output_file="tests/${1%.csv}_minmax.csv"
+
+    # Vérifier si le fichier d'entrée existe
+    if [[ ! -f "$input_file" ]]; then
+        echo "Error: Input file '$input_file' not found." >&2
+        exit 1
+    fi
+
+    # Vérifier si le fichier d'entrée contient des données
+    if [[ ! -s "$input_file" ]]; then
+        echo "Error: Input file '$input_file' is empty." >&2
+        exit 1
+    fi
+
+    echo "Creating a file with the 10 best and 10 worst stations based on capacity-consumption difference..."
+
+    {
+        # Garder l'en-tête
+        head -n 1 "$input_file" > "$output_file"
+
+        # Calculer la différence, trier par valeur croissante, et extraire les 10 pires (sans afficher la différence)
+        tail -n +2 "$input_file" | awk -F':' '{
+            diff = $2 - $3; # Capacité - Consommation
+            print diff, $0; # Ajouter la différence pour trier
+        }' | sort -n | awk '{sub($1 FS, ""); print}' | head -n 10 >> "$output_file"
+
+        # Calculer la différence, trier par valeur décroissante, et extraire les 10 meilleures (sans afficher la différence)
+        tail -n +2 "$input_file" | awk -F':' '{
+            diff = $2 - $3; # Capacité - Consommation
+            print diff, $0; # Ajouter la différence pour trier
+        }' | sort -nr | awk '{sub($1 FS, ""); print}' | head -n 10 >> "$output_file"
+    }
+
+    # Vérifier si le fichier de sortie a été créé avec succès
+    if [[ ! -f "$output_file" || ! -s "$output_file" ]]; then
+        echo "Error: Failed to create output file '$output_file'." >&2
+        exit 1
+    fi
+
+    echo "File with top 10 best and worst stations saved to '$output_file'."
+}
+
 
 
     
@@ -328,6 +372,12 @@ main() {
     fi
 
     measure_time sort_file "$input_file"
+    
+    if [[ "$station_type" == "lv" && "$consumer_type" == "all" ]]; then
+        measure_time sort_file_minmax "$input_file"
+        copy_and_transform_csv "lv_all_minmax.csv"
+    fi
+
 
     copy_and_transform_csv "$input_file"
 

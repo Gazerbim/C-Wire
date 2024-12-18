@@ -12,7 +12,7 @@ void fprintAVL(pAvl node, FILE *file) {
 //will write the header and launch the fprintAVL function
 void transferToFile(pAvl tree, int isLv, int isHva, int isHvb, char* station, char* consumer, char* powerplant) {
     FILE *file;
-    char fileTitle[200]="../test/";
+    char fileTitle[200]="../tests/";
     strcat(fileTitle, station);
     strcat(fileTitle, "_");
     strcat(fileTitle, consumer);

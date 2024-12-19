@@ -207,12 +207,13 @@ filter_and_copy_data() {
 }
 
 sort_file() {
+    # Change directory to 'tests'
     cd tests/
     
+    # Store the input file name in a local variable
     local input_file="$1"
     
-
-    # Vérifier si le fichier source existe et contient des données
+    # Check if the input file exists and contains data
     if [[ ! -f "$input_file" ]]; then
         echo "Error: $input_file not found. Ensure the filtering step is completed." >&2
         exit 1
@@ -223,48 +224,47 @@ sort_file() {
         exit 1
     fi
 
-    # Déterminer le nom du fichier temporaire pour le tri
+    # Determine the name of the temporary file for sorting
     local temp_sorted_file="${input_file%.csv}_sorted.csv"
 
     echo "Sorting data by numeric capacity in ascending order from $input_file..."
 
-    # Traiter l'en-tête et trier les données
+    # Process the header and sort the data
     {
-        # Extraire l'en-tête
+        # Extract the header (first line of the file)
         head -n 1 "$input_file"
 
-        # Trier les lignes à partir de la deuxième, sur la colonne numérique appropriée
+        # Sort the rest of the lines (data only) based on the second column (capacity) numerically
         tail -n +2 "$input_file" | sort -t ':' -k2,2n
     } > "$temp_sorted_file"
 
-    # Vérifier si le tri a fonctionné
+    # Check if the sorting operation succeeded
     if [[ ! -s "$temp_sorted_file" ]]; then
         echo "Error: Sorting failed. $temp_sorted_file is empty." >&2
         exit 1
     fi
 
-    # Remplacer le contenu de l'ancien fichier par le fichier trié
+    # Replace the original file content with the sorted data
     mv "$temp_sorted_file" "$input_file"
 
     echo "File tests/$input_file successfully updated with sorted data."
     cd ..
 }
 
-
-# Function: Copy and transform CSV to remove ';' and save as .csv in 'graphs'
+# Function: Copy and transform CSV to remove ':' and save it as a new file in 'graphs'
 copy_and_transform_csv() {
+    # Define input and output file paths
     local input_file="tests/$1"
     local output_file="graphs/$1"
     
-
     # Check if the input file exists
     if [[ ! -f "$input_file" ]]; then
         echo "Error: Input file '$input_file' does not exist." >&2
         exit 1
     fi
 
-    # Transform and copy the file
-    echo "Removing ';' and saving as CSV to '$output_file'..."
+    # Transform and copy the file, replacing ':' with spaces and saving to the output path
+    echo "Removing ':' and saving as CSV to '$output_file'..."
     sed 's/:/ /g' "$input_file" > "$output_file"
 
     # Check if the transformation succeeded
@@ -281,17 +281,19 @@ copy_and_transform_csv() {
 
     echo "File has been successfully transformed and saved to '$output_file'."
 }
+
 sort_file_minmax() {
+    # Define input and output file paths
     local input_file="tests/$1"
     local output_file="tests/${1%.csv}_minmax.csv"
 
-    # Vérifier si le fichier d'entrée existe
+    # Check if the input file exists
     if [[ ! -f "$input_file" ]]; then
         echo "Error: Input file '$input_file' not found." >&2
         exit 1
     fi
 
-    # Vérifier si le fichier d'entrée contient des données
+    # Check if the input file contains data
     if [[ ! -s "$input_file" ]]; then
         echo "Error: Input file '$input_file' is empty." >&2
         exit 1
@@ -300,23 +302,26 @@ sort_file_minmax() {
     echo "Creating a file with the 10 best and 10 worst stations based on capacity-consumption difference..."
 
     {
-        # Garder l'en-tête
-        head -n 1 "$input_file" > "$output_file"
+  	echo "Min and Max 'capacity-load' extreme nodes" > "$output_file"
+        # Preserve the header from the input file
+        head -n 1 "$input_file" >> "$output_file"
 
-        # Calculer la différence, trier par valeur croissante, et extraire les 10 pires (sans afficher la différence)
-        tail -n +2 "$input_file" | awk -F':' '{
-            diff = $2 - $3; # Capacité - Consommation
-            print diff, $0; # Ajouter la différence pour trier
+        # Compute the difference between capacity and consumption, sort by ascending difference,
+        # and extract the 10 worst stations (remove the difference column for output)
+        tail -n +3 "$input_file" | awk -F':' '{
+            diff = $2 - $3; # Compute the difference: Capacity - Consumption
+            print diff, $0; # Add the difference column for sorting
         }' | sort -n | awk '{sub($1 FS, ""); print}' | head -n 10 >> "$output_file"
 
-        # Calculer la différence, trier par valeur décroissante, et extraire les 10 meilleures (sans afficher la différence)
-        tail -n +2 "$input_file" | awk -F':' '{
-            diff = $2 - $3; # Capacité - Consommation
-            print diff, $0; # Ajouter la différence pour trier
+        # Compute the difference again, sort by descending difference,
+        # and extract the 10 best stations (remove the difference column for output)
+        tail -n +3 "$input_file" | awk -F':' '{
+            diff = $2 - $3; # Compute the difference: Capacity - Consumption
+            print diff, $0; # Add the difference column for sorting
         }' | sort -nr | awk '{sub($1 FS, ""); print}' | head -n 10 >> "$output_file"
     }
 
-    # Vérifier si le fichier de sortie a été créé avec succès
+    # Check if the output file was created successfully and contains data
     if [[ ! -f "$output_file" || ! -s "$output_file" ]]; then
         echo "Error: Failed to create output file '$output_file'." >&2
         exit 1
@@ -327,63 +332,87 @@ sort_file_minmax() {
 
 
 
+
     
 
 # Main function: Orchestrates the script's operations
 main() {
+    # Set a time format to measure execution time of specific steps
     TIMEFORMAT=%R
+
+    # Check if the help flag is included in the arguments, display help, and exit
     if [[ "$*" == *"-h"* ]]; then
         display_help
         exit 0
     fi
 
-    # Check minimum parameter count
+    # Ensure the script has at least three parameters
     if [[ $# -lt 3 ]]; then
         echo "Error: Missing parameters." >&2
         display_help
         exit 1
     fi
 
-    local csv_file="inputs/$1"
-    local station_type="$2"
-    local consumer_type="$3"
-    local central_id="${4:-all}"  # Default to "all" if not provided
+    # Define variables for script parameters
+    local csv_file="inputs/$1"          # Input CSV file path
+    local station_type="$2"            # Station type (e.g., "hv", "lv")
+    local consumer_type="$3"           # Consumer type (e.g., "all", "household")
+    local central_id="${4:-all}"       # Central ID, defaulting to "all" if not specified
 
+    # Verify the validity of provided parameters
     verify_parameters "$csv_file" "$station_type" "$consumer_type"
+
+    # Ensure the temporary directory exists
     check_and_create_tmp
 
-    # Display the parameters
+    echo " "
+    # Display the input parameters for clarity
     echo "CSV file: $csv_file"
     echo "Station type: $station_type"
     echo "Consumer type: $consumer_type"
     echo "Central ID: $central_id"
-    
+    echo " "
+    # Measure the time taken to filter and copy data
     measure_time filter_and_copy_data "$csv_file" "$station_type" "$consumer_type" "$central_id"
     echo "Processing completed successfully."
+    echo " "
 
+    # Perform additional checks and compilation if necessary
     check_and_compile "$station_type" "$consumer_type" "$central_id"
+    echo " "
 	
-    # Déterminer le nom du fichier source
+    # Determine the name of the source file to process
     local input_file
     if [[ "$central_id" == "all" ]]; then
+        # If all central IDs are included
         input_file="${station_type}_${consumer_type}.csv"
     else
+        # If a specific central ID is specified
         input_file="${station_type}_${consumer_type}_${central_id}.csv"
     fi
 
+    # Measure the time taken to sort the source file
     measure_time sort_file "$input_file"
+    echo " "
     
+    # If the station type is "lv" and consumer type is "all", process min/max sorting and transformation
     if [[ "$station_type" == "lv" && "$consumer_type" == "all" ]]; then
         measure_time sort_file_minmax "$input_file"
+        # Copy and transform the minmax sorted file
         copy_and_transform_csv "lv_all_minmax.csv"
+        echo " "
     fi
 
-
+    # Copy and transform the main input file
     copy_and_transform_csv "$input_file"
+    echo " "
 
+    # Navigate to the CodeC directory, clean up previous builds, and return to the original directory
     cd CodeC/
     make clean
     cd ..
 }
 
+# Invoke the main function with all passed arguments
 main "$@"
+

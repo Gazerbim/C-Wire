@@ -1,21 +1,29 @@
 #!/usr/bin/bash
 
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[1;34m'
+CYAN='\033[1;36m'
+MAGENTA='\033[1;35m'
+RESET='\033[0m'
+
 # Function: Display help
 display_help() {
-    echo "Usage: $0 <path_to_CSV_file> <station_type> <consumer_type> [central_id] [-h]"
+    echo -e "${CYAN}Usage:${RESET} $0 <path_to_CSV_file> <station_type> <consumer_type> [central_id] [-h]"
     echo ""
-    echo "Parameter descriptions:"
-    echo "  <path_to_CSV_file>   Path to the CSV file containing the data (required)."
-    echo "  <station_type>       Type of station to process: hvb, hva, lv (required)."
-    echo "  <consumer_type>      Type of consumer: comp (business), indiv (individual), all (all) (required)."
-    echo "  [central_id]         ID of a specific station (optional)."
-    echo "  -h                   Display this help and ignore all other parameters (optional)."
+    echo -e "${YELLOW}Parameter descriptions:${RESET}"
+    echo -e "  ${BLUE}<path_to_CSV_file>${RESET}   Path to the CSV file containing the data (required)."
+    echo -e "  ${BLUE}<station_type>${RESET}       Type of station to process: hvb, hva, lv (required)."
+    echo -e "  ${BLUE}<consumer_type>${RESET}      Type of consumer: comp (business), indiv (individual), all (all) (required)."
+    echo -e "  ${BLUE}[central_id]${RESET}         ID of a specific station (optional)."
+    echo -e "  ${BLUE}-h${RESET}                   Display this help and ignore all other parameters (optional)."
     echo ""
-    echo "Restrictions:"
+    echo -e "${YELLOW}Restrictions:${RESET}"
     echo "  The following combinations are forbidden:"
-    echo "  - hvb all, hva all, hvb indiv, hva indiv"
+    echo -e "  - ${RED}hvb all${RESET}, ${RED}hva all${RESET}, ${RED}hvb indiv${RESET}, ${RED}hva indiv${RESET}"
     echo ""
-    echo "Example usage:"
+    echo -e "${YELLOW}Example usage:${RESET}"
     echo "  $0 data.csv hvb comp 1"
 }
 
@@ -27,28 +35,28 @@ verify_parameters() {
 
     # Check if the CSV file exists
     if [[ ! -f "$csv_file" ]]; then
-        echo "Error: File $csv_file does not exist." >&2
+        echo -e "${RED}Error:${RESET} File $csv_file does not exist." >&2
         display_help
         exit 1
     fi
 
     # Validate station type
     if [[ "$station_type" != "hvb" && "$station_type" != "hva" && "$station_type" != "lv" ]]; then
-        echo "Error: Invalid station type. Choose hvb, hva, or lv." >&2
+        echo -e "${RED}Error:${RESET} Invalid station type. Choose ${BLUE}hvb${RESET}, ${BLUE}hva${RESET}, or ${BLUE}lv${RESET}." >&2
         display_help
         exit 1
     fi
 
     # Validate consumer type
     if [[ "$consumer_type" != "comp" && "$consumer_type" != "indiv" && "$consumer_type" != "all" ]]; then
-        echo "Error: Invalid consumer type. Choose comp, indiv, or all." >&2
+        echo -e "${RED}Error:${RESET} Invalid consumer type. Choose ${BLUE}comp${RESET}, ${BLUE}indiv${RESET}, or ${BLUE}all${RESET}." >&2
         display_help
         exit 1
     fi
 
     # Check forbidden combinations of station/consumer
     if { [[ "$station_type" == "hvb" || "$station_type" == "hva" ]] && [[ "$consumer_type" == "all" || "$consumer_type" == "indiv" ]]; }; then
-        echo "Error: The combination $station_type $consumer_type is forbidden." >&2
+        echo -e "${RED}Error:${RESET} The combination ${BLUE}$station_type${RESET} ${BLUE}$consumer_type${RESET} is forbidden." >&2
         display_help
         exit 1
     fi
@@ -58,26 +66,26 @@ verify_parameters() {
 check_and_create_tmp() {
     # Ensure "tmp" directory exists and is empty
     if [[ -d "tmp" ]]; then
-        echo "The tmp directory already exists. Clearing its contents..."
+        echo -e "${YELLOW}The tmp directory already exists.${RESET} ${CYAN}Clearing its contents...${RESET}"
         rm -rf tmp/* # Delete all contents of "tmp" without deleting the directory
     else
-        echo "Creating the tmp directory..."
+        echo -e "${GREEN}Creating the tmp directory...${RESET}"
         mkdir tmp
     fi
 
     # Ensure "graphs" directory exists
     if [[ -d "graphs" ]]; then
-        echo "The graphs directory already exists."
+        echo -e "${YELLOW}The graphs directory already exists.${RESET}"
     else
-        echo "Creating the graphs directory..."
+        echo -e "${GREEN}Creating the graphs directory...${RESET}"
         mkdir graphs
     fi
 
     # Ensure "tests" directory exists
     if [[ -d "tests" ]]; then
-        echo "The tests directory already exists."
+        echo -e "${YELLOW}The tests directory already exists.${RESET}"
     else
-        echo "Creating the tests directory..."
+        echo -e "${GREEN}Creating the tests directory...${RESET}"
         mkdir tests
     fi
 }
@@ -95,7 +103,7 @@ measure_time() {
     local end_time=$(date +%s.%N)  # End time
     local elapsed_time=$(awk "BEGIN {print $end_time - $start_time}")  # Calculate using awk
 
-    printf "Execution time for %s: %.3f sec\n" "$func" "$elapsed_time"
+    printf "${CYAN}Execution time for ${BLUE}%s${RESET}: %.3f sec\n" "$func" "$elapsed_time"
 
     return $func_exit_code
 }
@@ -111,31 +119,32 @@ check_and_compile() {
 
     # Verify if the Makefile exists
     if [[ ! -f "$makefile" ]]; then
-        echo "Error: Makefile not found in the directory." >&2
+        echo -e "${RED}Error:${RESET} Makefile not found in the directory." >&2
         exit 1
     fi
 
     # Run 'make' to compile the executable
-    echo "Running 'make' to compile..."
+    echo -e "${CYAN}Running 'make' to compile...${RESET}"
     make
     if [[ $? -ne 0 ]]; then
-        echo "Error: Compilation failed using 'make'." >&2
+        echo -e "${RED}Error:${RESET} Compilation failed using 'make'." >&2
         exit 1
     fi
 
-    echo "Compilation successful. Executable '$executable' created."
+    echo -e "${GREEN}Compilation successful.${RESET} Executable '${BLUE}$executable${RESET}' created."
 
     # Verify if the executable exists after compilation
     if [[ ! -f "$executable" ]]; then
-        echo "Error: The executable '$executable' was not created." >&2
+        echo -e "${RED}Error:${RESET} The executable '${BLUE}$executable${RESET}' was not created." >&2
         exit 1
     fi
 
     # Execute the compiled executable
-    echo "Executing '$executable'..."
+    echo -e "${CYAN}Executing '${BLUE}$executable${RESET}'...${RESET}"
     measure_time ./$executable "$station_type" "$consumer_type" "$central_id"
     cd ..
 }
+
 
 # Function: Filter and copy data from the CSV file
 filter_and_copy_data() {
@@ -145,7 +154,7 @@ filter_and_copy_data() {
     local central_id="$4"
     local output_file="tmp/filtered_data.dat"
 
-    echo "Filtering data based on station type, consumer type, and central ID..."
+    echo -e "${CYAN}Filtering data based on station type, consumer type, and central ID...${RESET}"
 
     # Determine column indices based on station type
     local station_index consumer_index no_station
@@ -198,14 +207,16 @@ filter_and_copy_data() {
         print "\rProgress: 100%   " > "/dev/stderr";
     }' "$input_file"
 
-    echo "Filtered data has been saved to $output_file"
+    echo -e "${GREEN}Filtered data has been saved to $output_file${RESET}"
     nb_lignes=$(wc -l < "$output_file")
     if [[ "$nb_lignes" == 1 ]]; then 
-        echo "There is no station $station_type $consumer_type"
+        echo -e "${RED}There is no station $station_type $consumer_type${RESET}"
         exit 1
     fi
 }
 
+
+# Function: Sort file based on capacity
 sort_file() {
     # Change directory to 'tests'
     cd tests/
@@ -215,19 +226,19 @@ sort_file() {
     
     # Check if the input file exists and contains data
     if [[ ! -f "$input_file" ]]; then
-        echo "Error: $input_file not found. Ensure the filtering step is completed." >&2
+        echo -e "${RED}Error: $input_file not found. Ensure the filtering step is completed.${RESET}" >&2
         exit 1
     fi
 
     if [[ ! -s "$input_file" ]]; then
-        echo "Error: $input_file is empty. Check the filtering process." >&2
+        echo -e "${RED}Error: $input_file is empty. Check the filtering process.${RESET}" >&2
         exit 1
     fi
 
     # Determine the name of the temporary file for sorting
     local temp_sorted_file="${input_file%.csv}_sorted.csv"
 
-    echo "Sorting data by numeric capacity in ascending order from $input_file..."
+    echo -e "${CYAN}Sorting data by numeric capacity in ascending order from $input_file...${RESET}"
 
     # Process the header and sort the data
     {
@@ -240,14 +251,14 @@ sort_file() {
 
     # Check if the sorting operation succeeded
     if [[ ! -s "$temp_sorted_file" ]]; then
-        echo "Error: Sorting failed. $temp_sorted_file is empty." >&2
+        echo -e "${RED}Error: Sorting failed. $temp_sorted_file is empty.${RESET}" >&2
         exit 1
     fi
 
     # Replace the original file content with the sorted data
     mv "$temp_sorted_file" "$input_file"
 
-    echo "File tests/$input_file successfully updated with sorted data."
+    echo -e "${GREEN}File tests/$input_file successfully updated with sorted data.${RESET}"
     cd ..
 }
 
@@ -259,29 +270,30 @@ copy_and_transform_csv() {
     
     # Check if the input file exists
     if [[ ! -f "$input_file" ]]; then
-        echo "Error: Input file '$input_file' does not exist." >&2
+        echo -e "${RED}Error: Input file '$input_file' does not exist.${RESET}" >&2
         exit 1
     fi
 
     # Transform and copy the file, replacing ':' with spaces and saving to the output path
-    echo "Removing ':' and saving as CSV to '$output_file'..."
+    echo -e "${CYAN}Removing ':' and saving as CSV to '$output_file'...${RESET}"
     sed 's/:/ /g' "$input_file" > "$output_file"
 
     # Check if the transformation succeeded
     if [[ $? -ne 0 ]]; then
-        echo "Error: Failed to transform and copy '$input_file'." >&2
+        echo -e "${RED}Error: Failed to transform and copy '$input_file'.${RESET}" >&2
         exit 1
     fi
 
     # Verify the output file is not empty
     if [[ ! -s "$output_file" ]]; then
-        echo "Error: The output file '$output_file' is empty. Something went wrong." >&2
+        echo -e "${RED}Error: The output file '$output_file' is empty. Something went wrong.${RESET}" >&2
         exit 1
     fi
 
-    echo "File has been successfully transformed and saved to '$output_file'."
+    echo -e "${GREEN}File has been successfully transformed and saved to '$output_file'.${RESET}"
 }
 
+# Function: Create minmax file with top and bottom stations based on capacity-consumption difference
 sort_file_minmax() {
     # Define input and output file paths
     local input_file="tests/$1"
@@ -289,20 +301,20 @@ sort_file_minmax() {
 
     # Check if the input file exists
     if [[ ! -f "$input_file" ]]; then
-        echo "Error: Input file '$input_file' not found." >&2
+        echo -e "${RED}Error: Input file '$input_file' not found.${RESET}" >&2
         exit 1
     fi
 
     # Check if the input file contains data
     if [[ ! -s "$input_file" ]]; then
-        echo "Error: Input file '$input_file' is empty." >&2
+        echo -e "${RED}Error: Input file '$input_file' is empty.${RESET}" >&2
         exit 1
     fi
 
-    echo "Creating a file with the 10 best and 10 worst stations based on capacity-consumption difference..."
+    echo -e "${CYAN}Creating a file with the 10 best and 10 worst stations based on capacity-consumption difference...${RESET}"
 
     {
-  	echo "Min and Max 'capacity-load' extreme nodes" > "$output_file"
+        echo "Min and Max 'capacity-load' extreme nodes" > "$output_file"
         # Preserve the header from the input file
         head -n 1 "$input_file" >> "$output_file"
 
@@ -323,12 +335,13 @@ sort_file_minmax() {
 
     # Check if the output file was created successfully and contains data
     if [[ ! -f "$output_file" || ! -s "$output_file" ]]; then
-        echo "Error: Failed to create output file '$output_file'." >&2
+        echo -e "${RED}Error: Failed to create output file '$output_file'.${RESET}" >&2
         exit 1
     fi
 
-    echo "File with top 10 best and worst stations saved to '$output_file'."
+    echo -e "${GREEN}File with top 10 best and worst stations saved to '$output_file'.${RESET}"
 }
+
 
 
 
@@ -348,16 +361,16 @@ main() {
 
     # Ensure the script has at least three parameters
     if [[ $# -lt 3 ]]; then
-        echo "Error: Missing parameters." >&2
+        echo -e "${RED}Error: Missing parameters.${RESET}" >&2
         display_help
         exit 1
     fi
 
     # Define variables for script parameters
     local csv_file="inputs/$1"          # Input CSV file path
-    local station_type="$2"            # Station type (e.g., "hv", "lv")
-    local consumer_type="$3"           # Consumer type (e.g., "all", "household")
-    local central_id="${4:-all}"       # Central ID, defaulting to "all" if not specified
+    local station_type="$2"             # Station type (e.g., "hv", "lv")
+    local consumer_type="$3"            # Consumer type (e.g., "all", "household")
+    local central_id="${4:-all}"        # Central ID, defaulting to "all" if not specified
 
     # Verify the validity of provided parameters
     verify_parameters "$csv_file" "$station_type" "$consumer_type"
@@ -365,22 +378,21 @@ main() {
     # Ensure the temporary directory exists
     check_and_create_tmp
 
-    echo " "
+    echo -e "\n${CYAN}Input Parameters:${RESET}"
     # Display the input parameters for clarity
-    echo "CSV file: $csv_file"
-    echo "Station type: $station_type"
-    echo "Consumer type: $consumer_type"
-    echo "Central ID: $central_id"
-    echo " "
+    echo -e "${CYAN}CSV file:${RESET} $csv_file"
+    echo -e "${CYAN}Station type:${RESET} $station_type"
+    echo -e "${CYAN}Consumer type:${RESET} $consumer_type"
+    echo -e "${CYAN}Central ID:${RESET} $central_id\n"
+
     # Measure the time taken to filter and copy data
     measure_time filter_and_copy_data "$csv_file" "$station_type" "$consumer_type" "$central_id"
-    echo "Processing completed successfully."
-    echo " "
+    echo -e "${GREEN}Processing completed successfully.${RESET}\n"
 
     # Perform additional checks and compilation if necessary
     check_and_compile "$station_type" "$consumer_type" "$central_id"
-    echo " "
-	
+    echo -e "\n${GREEN}Compilation and execution completed.${RESET}"
+
     # Determine the name of the source file to process
     local input_file
     if [[ "$central_id" == "all" ]]; then
@@ -393,19 +405,19 @@ main() {
 
     # Measure the time taken to sort the source file
     measure_time sort_file "$input_file"
-    echo " "
-    
+    echo -e "\n${GREEN}Sorting completed.${RESET}"
+
     # If the station type is "lv" and consumer type is "all", process min/max sorting and transformation
     if [[ "$station_type" == "lv" && "$consumer_type" == "all" ]]; then
         measure_time sort_file_minmax "$input_file"
         # Copy and transform the minmax sorted file
         copy_and_transform_csv "lv_all_minmax.csv"
-        echo " "
+        echo -e "${GREEN}Min/Max Sorting and Transformation Completed.${RESET}\n"
     fi
 
     # Copy and transform the main input file
     copy_and_transform_csv "$input_file"
-    echo " "
+    echo -e "${GREEN}Transformation of the main input file completed.${RESET}\n"
 
     # Navigate to the CodeC directory, clean up previous builds, and return to the original directory
     cd CodeC/
@@ -415,4 +427,5 @@ main() {
 
 # Invoke the main function with all passed arguments
 main "$@"
+
 

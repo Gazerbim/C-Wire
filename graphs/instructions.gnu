@@ -1,6 +1,6 @@
 # graphique.gnu
 # Définir une variable pour le fichier de données
-datafile = "lv_indiv.csv"  # Valeur par défaut (à modifier se nécessaire)
+datafile = "../tests/hvb_comp.csv"  # Valeur par défaut (à modifier si nécessaire)
 
 # Définir le nom du fichier de sortie
 set terminal png size 1600,900 # Définition du format et de la taille
@@ -12,8 +12,7 @@ set xlabel "Station HV-A"
 set ylabel "Puissance (kWh)"
 
 # Tracer l'histogramme
-plot datafile u 1:2 with boxes title "Capacité", \
-    "" u 1:3 with boxes title "Consommation"
+plot datafile u 1:2 with boxes title "Capacité", "" u 1:3 with boxes title "Consommation"
 
 # Clôturer la commande de sauvegarde
 set output

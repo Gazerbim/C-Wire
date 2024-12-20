@@ -1,6 +1,6 @@
 # graphique.gnu
 # Définir une variable pour le fichier de données
-datafile = "tests/hvb_comp.csv"  # Valeur par défaut (à modifier si nécessaire)
+datafile = "graphs/hvb_comp.csv"  # Valeur par défaut (à modifier si nécessaire)
 
 # Définir le nom du fichier de sortie
 set terminal png size 1600,900 # Définition du format et de la taille

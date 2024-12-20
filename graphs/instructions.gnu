@@ -12,6 +12,7 @@ set style fill solid 1.00 border -1 # Remplissage des barres
 set boxwidth 0.25 relative # Largeur des barres
 set title "Histogramme représentant la puissance par rapport aux stations"
 set xlabel "Station HV-B"
+set xtics 1,1
 set ylabel "Puissance (kWh)"
 
 # Tracer l'histogramme

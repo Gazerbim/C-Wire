@@ -1,6 +1,6 @@
 #include "settings.h"
 
-//will write the data in the tree in the file in the id order
+//will write the data in the tree in the file in the id order with an Inorder Traversal
 void fprintAVL(pAvl node, FILE *file) {
     if (node != NULL){
         fprintAVL(node->leftSon, file);
@@ -12,7 +12,7 @@ void fprintAVL(pAvl node, FILE *file) {
 //will write the header and launch the fprintAVL function
 void transferToFile(pAvl tree, int isLv, int isHva, int isHvb, char* station, char* consumer, char* powerplant) {
     FILE *file;
-    char fileTitle[200]="../tests/";
+    char fileTitle[200]="../tests/"; // the name of the file that will be filled by the AVL
     strcat(fileTitle, station);
     strcat(fileTitle, "_");
     strcat(fileTitle, consumer);
@@ -21,12 +21,12 @@ void transferToFile(pAvl tree, int isLv, int isHva, int isHvb, char* station, ch
         strcat(fileTitle, powerplant);
     }
     strcat(fileTitle, ".csv");
-    file = fopen(fileTitle, "w+");
+    file = fopen(fileTitle, "w+"); // open the file with the previously created name
     if (file == NULL) {
         printf("Error opening file\n");
         exit(4);
     }
-    if (isLv) {
+    if (isLv) { // print the header depending on the asked station type 
         fprintf(file, "LV_Station:Capacity:Consumption_(%s)\n", consumer);
     }
     if (isHva) {
@@ -35,6 +35,6 @@ void transferToFile(pAvl tree, int isLv, int isHva, int isHvb, char* station, ch
     if (isHvb) {
         fprintf(file, "HVB_Station:Capacity:Consumption_(%s)\n", consumer);
     }
-    fprintAVL(tree, file);
-    fclose(file);
+    fprintAVL(tree, file); // write the data in the file
+    fclose(file); // close the file
 }

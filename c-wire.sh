@@ -343,9 +343,24 @@ sort_file_minmax() {
 }
 
 
+graphique() {
+    input_file="$1"
+    cd graphs
+    echo -e "${GREEN}creation of the graph"
+    FICHIER_TEMP="input.csv"
+    FICHIER_GNU="instructions.gnu"
+    cp "$input_file" "$FICHIER_TEMP"
+    
+    gnuplot "$FICHIER_GNU"
+    cp "graphique.png" "${input_file}.png"
+    
 
+    rm graphique.png
+    rm "$FICHIER_TEMP"
+    echo -e "graphique successful${RESET}"
+    cd ..
 
-
+}
     
 
 # Main function: Orchestrates the script's operations
@@ -407,18 +422,21 @@ main() {
     measure_time sort_file "$input_file"
     echo -e "\n${GREEN}Sorting completed.${RESET}"
 
-    # If the station type is "lv" and consumer type is "all", process min/max sorting and transformation
+    # Copy and transform the main input file
+    copy_and_transform_csv "$input_file"
+    echo -e "${GREEN}Transformation of the main input file completed.${RESET}\n"
+    
+    # If the station type is "lv" and consumer type is "all", process min/max sorting and      transformation
     if [[ "$station_type" == "lv" && "$consumer_type" == "all" ]]; then
         measure_time sort_file_minmax "$input_file"
         # Copy and transform the minmax sorted file
         copy_and_transform_csv "lv_all_minmax.csv"
         echo -e "${GREEN}Min/Max Sorting and Transformation Completed.${RESET}\n"
+        measure_time graphique "lv_all_minmax.csv"
     fi
-
-    # Copy and transform the main input file
-    copy_and_transform_csv "$input_file"
-    echo -e "${GREEN}Transformation of the main input file completed.${RESET}\n"
-
+    echo ""
+    
+ 
     # Navigate to the CodeC directory, clean up previous builds, and return to the original directory
     cd CodeC/
     make clean
@@ -427,5 +445,3 @@ main() {
 
 # Invoke the main function with all passed arguments
 main "$@"
-
-

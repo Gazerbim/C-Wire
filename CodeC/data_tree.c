@@ -16,6 +16,7 @@ int min3(int a, int b, int c) {
     return (a < b) ? (a < c ? a : c) : (b < c ? b : c);
 }
 
+//creates an empty node and return it
 pAvl createNode(){
     pAvl new = malloc(sizeof(Avl));
     if (new==NULL){
@@ -31,6 +32,7 @@ pAvl createNode(){
     return new;
 }
 
+//creates a node with a fixed capacity and id
 pAvl createAVL(long capacity, int id){
     pAvl new = createNode();
     new->capacity = capacity;
@@ -78,16 +80,19 @@ pAvl rotateLeft(pAvl node) {
 
 }
 
+//performs a double left rotation
 pAvl doubleRotateLeft(pAvl node){
     node->rightSon = rotateRight(node->rightSon);
     return rotateLeft(node);
 }
 
+//performs a double right rotation
 pAvl doubleRotateRight(pAvl node){
     node->leftSon = rotateLeft(node->leftSon);
     return rotateRight(node);
 }
 
+//balance an avl based on the node's balance
 pAvl balanceAVL(pAvl node){
     if(node->balance >= 2){
         if(node->rightSon->balance >= 0){
@@ -150,7 +155,7 @@ int research(pAvl node, int id, pAvl *searched) {
     }
 }
 
-// print the avl tree with a postorder way
+// print the avl tree with a inorder  way
 void printAVL(pAvl node) {
     if (node != NULL){
         printAVL(node->leftSon);
@@ -159,6 +164,7 @@ void printAVL(pAvl node) {
     }
 }
 
+//free all the memory taken by the tree
 void freeTree(pAvl node){
     if (node != NULL){
     freeTree(node->leftSon);

@@ -23,7 +23,7 @@ void transferToFile(pAvl tree, int isLv, int isHva, int isHvb, char* station, ch
     strcat(fileTitle, ".csv");
     file = fopen(fileTitle, "w+"); // open the file with the previously created name
     if (file == NULL) {
-        printf("Error opening file\n");
+        printf("Error opening the result file\n");
         exit(4);
     }
     if (isLv) { // print the header depending on the asked station type 

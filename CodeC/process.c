@@ -5,14 +5,14 @@
 pAvl updateStation(pAvl tree, int id, long load) {
     pAvl station;
     int h = 0;
-    int result = research(tree, id, &station);
+    int result = research(tree, id, &station); // will return 0 if the station doesn't exists and the new station that need to be inserted or 1 if the station exists and it's adress
     if (!result) {
-        tree = insertAVL(tree, 0, &h, id);
+        tree = insertAVL(tree, 0, &h, id); // insert the new station
     } else {
-        station->load += load;
+        station->load += load; // increase the station's load by the consumption of the consumer
     }
 
-    return tree;
+    return tree; // return the tree
 }
 
 
@@ -48,12 +48,10 @@ pAvl buildAvl(pAvl tree, int isLv, int isHva, int isHvb, char *chvb, char *chva,
 /*Will decode informations in the file based on the command executed, and will fill the tree*/
 pAvl readDataAndBuildAVL(pAvl tree, FILE * file,int isLv, int isHva, int isHvb){
     char *cpp, *chvb, *chva, *clv, *ccomp, *cindiv, *ccapa, *cload;
-    //int pp, hvb, hva, lv, comp, indiv, capa, load; 
     char line[256];
     rewind(file);
     int i=0;
-    // read each line the second time to sum the consuptions
-    
+    // read each line, associate a value to all the char* and call the buildAVL function for each line
     while (fgets(line, sizeof(line), file)) {
         i++;
         // delete line jump
@@ -77,15 +75,15 @@ pAvl readDataAndBuildAVL(pAvl tree, FILE * file,int isLv, int isHva, int isHvb){
 /*Open the file and launch the process*/
 pAvl handleTreeProcess(pAvl tree, int isLv, int isHva, int isHvb){
     FILE *file;
-    char *filename = "../tmp/filtered_data.dat";
+    char *filename = "../tmp/filtered_data.dat"; // the temp data file name
 
      // Open the file
     file = fopen(filename, "r");
     if (file == NULL) {
-        printf("Error while opening file");
+        printf("Error while opening the temp file");
         exit(2);
     }
-    tree = readDataAndBuildAVL(tree, file, isLv, isHva, isHvb);
-    fclose(file);
-    return tree;
+    tree = readDataAndBuildAVL(tree, file, isLv, isHva, isHvb); // build the tree
+    fclose(file); // close the temp file
+    return tree; // return the build tree
 }
